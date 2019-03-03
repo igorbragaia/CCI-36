@@ -1,7 +1,6 @@
 'use strict';
 
 //***** SETUP *****//
-// constants
 let
     objs = [],
     // Create a renderer with Antialiasing
