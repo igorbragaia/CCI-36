@@ -1,2 +1,2 @@
-# CCI-36
-![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+# Project 1 - 3D fire effect
+![Alt Text](https://raw.githubusercontent.com/igorbragaia/CCI-36/master/project1/project1GIF.gif)
