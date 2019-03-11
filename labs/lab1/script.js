@@ -15,7 +15,10 @@ let
 		// Visualize point light location.
 		helper = new THREE.PointLightHelper(light, 0.1);
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+camera.position.set(10,10,10);
+camera.lookAt(0,0,0);
+
+renderer.setSize(window.innerWidth*3/4, window.innerHeight*3/4);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
