@@ -1,1 +1,7 @@
 name: CCI-36 assignments
+gems:
+- jekyll-assets
+
+assets:
+    sources:
+        - assets/
