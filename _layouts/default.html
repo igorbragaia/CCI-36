@@ -7,21 +7,20 @@
 
 	<title>CCI-36 assignments</title>
 
-	<link rel="stylesheet" href="/css/main.css">
-	<link rel="canonical" href="http://yourdomain.com/jekyll/update/2019/03/11/welcome-to-jekyll.html">
+	<link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl }}">
+	<link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,800,600' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
 
 </head>
-
+<center>
 <body>
-  <center>
 		<h1>CCI-36 assignments, students Igor Bragaia and José Luciano</h1>
     <h3>Lab 1 (11Mar2019)</h3>
-		<script src="/js/three.js"></script>
-		<script src="/js/OrbitControls.js"></script>
-		<script src="/js/lab1.js"></script>
-    <center>
+		<script src="{{ "/js/three.js" | prepend: site.baseurl}}"></script>
+		<script src="{{ "/js/OrbitControls.js" | prepend: site.baseurl}}"></script>
+		<script src="{{ "/js/lab1.js" | prepend: site.baseurl}}"></script>
 </body>
+<center>
 
 </html>
