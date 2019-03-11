@@ -16,6 +16,8 @@ let
 		helper = new THREE.PointLightHelper(light, 0.1);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 document.body.appendChild(renderer.domElement);
 
@@ -44,6 +46,8 @@ function makeBook(bookWidth, bookHeight, bookThick, color) {
             hardcover = new THREE.Mesh(hardcover_geom, hardcover_mat),
             groupHardcover = new THREE.Group();
 
+				hardcover.castShadow = true; //default is false
+				hardcover.receiveShadow = true; //default
         let hardcoverBack = hardcover.clone();
         let hardcoverFront = hardcover.clone();
         hardcoverFront.position.z = thick;
@@ -59,6 +63,9 @@ function makeBook(bookWidth, bookHeight, bookThick, color) {
                 color: color
             }),
             hardcover_aux = new THREE.Mesh(hardcover_geom_aux, hardcover_mat_aux);
+
+				hardcover_aux.castShadow = true; //default is false
+				hardcover_aux.receiveShadow = true; //default
         hardcover_aux.position.x = 0;
         hardcover_aux.position.y = hardcoverWidth / 2;
         hardcover_aux.position.z = thick_aux / 2;
@@ -76,9 +83,12 @@ function makeBook(bookWidth, bookHeight, bookThick, color) {
             page_geom = new THREE.BoxBufferGeometry(paperWidth, paperHeight, 0.001),
             page_mat = new THREE.MeshLambertMaterial({
                 color: 0xF5F5F5
-            })
-        page = new THREE.Mesh(page_geom, page_mat),
+            }),
+        		page = new THREE.Mesh(page_geom, page_mat),
             groupPages = new THREE.Group();
+
+				page.castShadow = true; //default is false
+				page.receiveShadow = true; //default
 
         for (let i = 0; i < qtyPages; i++) {
             let singlePage = page.clone();
@@ -130,6 +140,9 @@ let makeShelf = function(rows) {
         }),
         base = new THREE.Mesh(base_geom, base_mat);
 
+		base.castShadow = true; //default is false
+		base.receiveShadow = true; //default
+
     let
         supportX = 1.3,
         supportY = 0.2 + 1.5 * rows,
@@ -139,6 +152,9 @@ let makeShelf = function(rows) {
             color: 0x654321
         }),
         support = new THREE.Mesh(support_geom, support_mat);
+
+		support.castShadow = true; //default is false
+		support.receiveShadow = true; //default
 
     supportLeft = support.clone();
     supportLeft.position.z = -supportZ / 2;
@@ -177,8 +193,10 @@ scene.add(shelf);
 planegeom = new THREE.PlaneGeometry(15, 15)
 planemat = new THREE.MeshLambertMaterial({
     color: 0xCCCC55
-})
-plane = new THREE.Mesh(planegeom, planemat)
+});
+plane = new THREE.Mesh(planegeom, planemat);
+plane.castShadow = true; //default is false
+plane.receiveShadow = true;
 
 plane.rotation.x = -Math.PI / 2.0
 
