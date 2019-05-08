@@ -1,5 +1,5 @@
-let scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+let scene = new THREE.Scene(),
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
     renderer = new THREE.WebGLRenderer({
         antialias: true
     });
@@ -31,8 +31,8 @@ let subscribeCylinders = function(bar){
 }
 
 let subscribeCylinder = function(radius, bar){
-  let geometry = new THREE.CylinderGeometry( radius, radius, params.height, 100);
-      material = mat_dark;
+  let geometry = new THREE.CylinderGeometry( radius, radius, params.height, 100),
+      material = mat_dark,
       cylinder = new THREE.Mesh( geometry, material );
   cylinder.position.x=2*params.max_radius*(bar+1);
   cylinder.position.y=3;
@@ -45,8 +45,8 @@ let subscribeCylinder = function(radius, bar){
 let subscribeAxe = function(bar){
   const height = params.height*(params.n+2);
   const axis_radius = params.min_radius/3;
-  let geometry = new THREE.CylinderGeometry( axis_radius, axis_radius, height, 100);
-      material = mat_clear;
+  let geometry = new THREE.CylinderGeometry( axis_radius, axis_radius, height, 100),
+      material = mat_clear,
       cylinder = new THREE.Mesh( geometry, material );
   cylinder.position.x = 2*params.max_radius*(bar+1);
   cylinder.position.y = 3;
