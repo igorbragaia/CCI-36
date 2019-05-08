@@ -10,19 +10,30 @@ document.body.appendChild(renderer.domElement);
 
 let mat_clear = new THREE.MeshLambertMaterial( { color: 0xFF7F7F} ),
     mat_dark = new THREE.MeshLambertMaterial( { color: 0xCE2029} ),
-    mat_highlight = new THREE.MeshBasicMaterial( {color:0xFFC0CB} );
+    mat_highlight = new THREE.MeshLambertMaterial( {color:0xff8000} );
 
 const params = {
   height: 0.2,
   max_radius: 1,
   min_radius: 0.5,
-  n: 10,
+  n: 5,
 }
 
 let slots = [],
     piecesState = {
+      axis:[null,null,null],
+      lastAxe: 0,
       bars:[[],[],[]],
+      holdPiece: null
     };
+let getLast = function(bar){
+  let meshs = piecesState.bars[bar];
+  response=null;
+  for(let mesh of meshs)
+    if(response == null || mesh.position.z > response.position.z)
+  	 response = mesh;
+  return response;
+}
 
 let subscribeCylinders = function(bar){
   const step = (params.max_radius-params.min_radius)/params.n;
@@ -38,6 +49,7 @@ let subscribeCylinder = function(radius, bar){
   cylinder.position.y = 3;
   cylinder.position.z = params.height*(piecesState.bars[bar].length+1);
   cylinder.rotation.x = Math.PI / 2;
+  cylinder.is_clear = false;
   scene.add( cylinder );
   piecesState.bars[bar].push( cylinder );
 }
@@ -46,13 +58,14 @@ let subscribeAxe = function(bar){
   const height = params.height*(params.n+2);
   const axis_radius = params.min_radius/3;
   let geometry = new THREE.CylinderGeometry( axis_radius, axis_radius, height, 100),
-      material = mat_clear,
+      material = mat_dark,
       cylinder = new THREE.Mesh( geometry, material );
   cylinder.position.x = 2*params.max_radius*(bar+1);
   cylinder.position.y = 3;
   cylinder.position.z = height/2;
   cylinder.rotation.x = Math.PI / 2;
   scene.add( cylinder );
+  piecesState.axis[bar] = cylinder;
 }
 
 let subscribeAxis = function(){
@@ -74,8 +87,6 @@ camera.position.y = -3;
 camera.up = new THREE.Vector3(0, 0, 1);
 camera.lookAt(new THREE.Vector3(4, 4, 0));
 
-
-
 var t_blacks=Math.PI/2.0;
 var t_whites=3.0*Math.PI/2.0;
 var anim_time=0;
@@ -83,8 +94,6 @@ var anim_time=0;
 t=t_whites
 
 boardcenter = new THREE.Vector3(4, 4, 0)
-
-
 
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector2(-1000,-1000);
@@ -113,90 +122,85 @@ var whites_turn=true;
 var grab_x, grab_y;
 
 function state_update(event) {
-
   if (event.type!='paint')
   {
-    for (i=0; i<pieces.length; i++)
-      if (pieces[i].is_white) pieces[i].material=mat_white; else pieces[i].material=mat_black;
+    for(let bar of piecesState.bars)
+      for(let piece of bar)
+        piece.material= (piece.is_clear && piecesState.holdPiece == null)? mat_highlight: mat_dark;
 
-    for (i=0; i<slots.length; i++)
-      slots[i].material= slots[i].is_clear? mat_clear: mat_dark;
+    if(piecesState.holdPiece != null)
+      piecesState.holdPiece.material = mat_highlight;
 
     updateCursor();
   }
 
   if (event.type=='mousemove' && state=='preselect')
   {
-    intersects = raycaster.intersectObjects(slots)
-	if (intersects.length) {
-    	if (!intersects[0].object.piece) intersects[0].object.material=mat_highlight;
-	}
-
-	intersects = raycaster.intersectObjects(pieces)
-	if (intersects.length) {
-	  if (intersects[0].object.is_white==whites_turn) intersects[0].object.material=mat_highlight;
-	}
+    if(!piecesState.lock){
+      intersects = raycaster.intersectObjects(piecesState.bars.flat());
+      for(let piece of piecesState.bars.flat())
+        piece.is_clear=false;
+      for(let piece of intersects)
+        piece.object.is_clear=true;
+    }
   }
 
   if (event.type=='mousedown' && state=='preselect')
   {
-	intersects = raycaster.intersectObjects(pieces)
-	if (intersects.length) {
-	  if (intersects[0].object.is_white==whites_turn)
-		{
-		  state='grab'
-		  grab = intersects[0].object;
-		  grab.position.z=1.0;
-		  grab_x=grab.position.x;
-		  grab_y=grab.position.y;
-		  return; // sempre retornar se mudou de estado
-		}
-	}
+    for(let bar=0;bar<3;bar++){
+      let last=[getLast(bar)].filter(x=>x!=null);
+      intersects = raycaster.intersectObjects(last);
+      for(let piece of intersects){
+        piece.object.is_clear=true;
+        state_update(new Event('paint'));
+        piece.object.position.z=3;
+        piecesState.holdPiece = piece.object;
+        piecesState.lastAxe = bar;
+        piecesState.bars[bar] = piecesState.bars[bar].filter(x=>x!=piecesState.holdPiece);
+        state='grab';
+      }
+    }
   }
 
   if (event.type=='mousemove' && state=='grab')
   {
-    intersects = raycaster.intersectObjects(slots)
-	if (intersects.length) {
-	    target_slot=intersects[0].object;
-    	if (!target_slot.is_clear && !target_slot.piece) {
-		  target_slot.material=mat_highlight;
-		  grab_x=target_slot.position.x;
-		  grab_y=target_slot.position.y;
-		}
-	}
+    // intersects = raycaster.intersectObjects([piecesState.holdPiece]);
+    // console.log(intersects);
+  	// if (intersects.length) {
+  	//     intersects[0].object.position.x=5;
+  	// }
   }
 
   if (event.type=='mouseup' && state=='grab')
   {
-    console.log(event.type);
-    intersects = raycaster.intersectObjects(slots)
-	if (intersects.length) {
-	    target_slot=intersects[0].object;
-    	if (!target_slot.is_clear && !target_slot.piece) {
-          origin_slot=grab.slot
-          origin_slot.piece=null;
-          target_slot.piece=grab;
-		  grab.slot=target_slot;
-		  grab.position.x=target_slot.position.x;
-		  grab.position.y=target_slot.position.y;
-		  grab.position.z=0.5;
-		  state='turning'
-		  anim_time=0;
-		  whites_turn=!whites_turn;
+    for(let bar=0;bar<3;bar++){
+      intersects = raycaster.intersectObjects([piecesState.axis[bar]]);
+      if(intersects.length && intersects[0].object.material == mat_highlight){
+        let piece = piecesState.holdPiece;
+        piece.position.z = params.height*(piecesState.bars[bar].length+1);
+        piece.position.x = 2*params.max_radius*(bar+1);
+        piecesState.holdPiece.is_clear=false;
+        piecesState.bars[bar].push(piece);
+        piecesState.holdPiece = null;
+        piecesState.lastAxe = bar;
+        state='preselect';
+        for(let axe of piecesState.axis)
+          axe.material = mat_dark;
+        return;
+      }
+    }
 
-		  grab=null;
-		  return; // sempre retornar se mudou de estado
-		}
-	}
-	state='preselect'
-	origin_slot=grab.slot
-	grab.position.x=origin_slot.position.x;
-	grab.position.y=origin_slot.position.y;
-	grab.position.z=0.5;
-	grab=null
-	return; // sempre retornar se mudou de estado
-
+    let bar = piecesState.lastAxe;
+    let piece = piecesState.holdPiece;
+    piece.position.z = params.height*(piecesState.bars[bar].length+1);
+    piece.position.x = 2*params.max_radius*(bar+1);
+    piecesState.holdPiece.is_clear=false;
+    piecesState.bars[bar].push(piece);
+    piecesState.holdPiece = null;
+    state='preselect';
+    for(let axe of piecesState.axis)
+      axe.material = mat_dark;
+    return;
   }
 
   if (event.type=='paint' && state=='turning')
@@ -209,29 +213,20 @@ function state_update(event) {
 
   if (event.type=='paint' && state=='grab')
   {
-     var vel=0.1
-     var x= grab.position.x;
-	 var y= grab.position.y;
-	 var dirx= grab_x-x;
-	 var diry= grab_y-y;
-	 var dist=Math.sqrt(dirx*dirx+diry*diry);
-	 if (dist > vel)
-	 {
-	   grab.position.x=x+vel*dirx/dist;
-	   grab.position.y=y+vel*diry/dist;
-	 }
-	 else
-	 {
-	   grab.position.x=grab_x;
-	   grab.position.y=grab_y;
-	 }
+      for(let bar=0;bar<3;bar++){
+        let last = getLast(bar);
+        if(last == null || (piecesState.holdPiece != null && last.geometry.boundingSphere.radius > piecesState.holdPiece.geometry.boundingSphere.radius))
+          piecesState.axis[bar].material = mat_highlight;
+      }
   }
-
-
 }
 
-
+let check = function(){
+  return piecesState.bars[0].length == 0 && piecesState.bars[1].length == 0 && piecesState.bars[2].length == params.n;
+}
+let estado=-1;
 function animate() {
+
     requestAnimationFrame(animate);
     state_update(new Event('paint'));
 
@@ -242,6 +237,17 @@ function animate() {
     camera.lookAt(boardcenter);
 
     renderer.render(scene, camera);
+
+    if(estado == -1){
+      estado = 0;
+    } else if(estado == 0){
+      if(check())
+        estado = 1;
+    } else if(estado == 1) {
+      alert("really good!");
+      estado = 10;
+    }
+
 }
 
 window.addEventListener( 'mousemove', state_update, false );
