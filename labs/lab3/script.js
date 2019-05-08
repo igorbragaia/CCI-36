@@ -11,18 +11,17 @@ var slots = []
 var pieces = []
 const params = {
   height: 0.2,
-  max_radius: 3,
-  min_radius: 1,
-  n: 15,
-  axis_radius: 0.2
+  max_radius: 1,
+  min_radius: 0.5,
+  n: 10,
 }
 var state = {
   bars:[[],[],[]],
 }
 
-var subscribeCylinders = function(n, bar){
-  const step=(params.max_radius-params.min_radius)/n;
-  for(let i=1; i<=n; i++)
+var subscribeCylinders = function(bar){
+  const step=(params.max_radius-params.min_radius)/params.n;
+  for(let i=1; i<=params.n; i++)
     subscribeCylinder(params.max_radius-i*step, bar);
 }
 
@@ -30,7 +29,7 @@ var subscribeCylinder = function(radius, bar){
   var geometry = new THREE.CylinderGeometry( radius, radius, params.height, 100);
   var material = new THREE.MeshLambertMaterial( { color: 0xCE2029 } );
   var cylinder = new THREE.Mesh( geometry, material );
-  cylinder.position.x=2*params.max_radius*bar;
+  cylinder.position.x=2*params.max_radius*(bar+1);
   cylinder.position.y=3;
   cylinder.position.z=params.height*(state.bars[bar].length+1);
   cylinder.rotation.x = Math.PI / 2;
@@ -38,22 +37,27 @@ var subscribeCylinder = function(radius, bar){
   state.bars[bar].push( cylinder );
 }
 
-var subscribeAxis = function(bar){
+var subscribeAxe = function(bar){
   const height = params.height*(params.n+2);
-  var geometry = new THREE.CylinderGeometry( params.axis_radius, params.axis_radius, height, 100);
+  const axis_radius = params.min_radius/3;
+  var geometry = new THREE.CylinderGeometry( axis_radius, axis_radius, height, 100);
   var material = new THREE.MeshLambertMaterial( { color: 0xFF7F7F } );
   var cylinder = new THREE.Mesh( geometry, material );
-  cylinder.position.x = 2*params.max_radius*bar;
+  cylinder.position.x = 2*params.max_radius*(bar+1);
   cylinder.position.y = 3;
   cylinder.position.z = height/2;
   cylinder.rotation.x = Math.PI / 2;
   scene.add( cylinder );
 }
 
-for(let i=0;i<3; i++){
-  subscribeCylinders(params.n, i);
-  subscribeAxis(i);
+var subscribeAxis = function(){
+  for(let i=0; i<state.bars.length; i++)
+    subscribeAxe(i);
 }
+
+subscribeCylinders(0);
+subscribeAxis();
+
 var light = new THREE.PointLight(0xffffff, 1.0);
 light.position.set(4, 4, 10);
 
