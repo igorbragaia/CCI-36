@@ -18,7 +18,7 @@ const params = {
   height: 0.2,
   max_radius: 1,
   min_radius: 0.5,
-  n: 4,
+  n: 15,
 }
 
 let slots = [],
