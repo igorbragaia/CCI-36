@@ -8,6 +8,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x220000);
 document.body.appendChild(renderer.domElement);
 
+const width=window.innerWidth;
+
 let mat_clear = new THREE.MeshLambertMaterial( { color: 0xFF7F7F} ),
     mat_dark = new THREE.MeshLambertMaterial( { color: 0xCE2029} ),
     mat_highlight = new THREE.MeshLambertMaterial( {color:0xff8000} );
@@ -16,7 +18,7 @@ const params = {
   height: 0.2,
   max_radius: 1,
   min_radius: 0.5,
-  n: 5,
+  n: 4,
 }
 
 let slots = [],
@@ -153,7 +155,7 @@ function state_update(event) {
       for(let piece of intersects){
         piece.object.is_clear=true;
         state_update(new Event('paint'));
-        piece.object.position.z=3;
+        piece.object.position.z = params.height*(params.n+5);
         piecesState.holdPiece = piece.object;
         piecesState.lastAxe = bar;
         piecesState.bars[bar] = piecesState.bars[bar].filter(x=>x!=piecesState.holdPiece);
@@ -164,11 +166,9 @@ function state_update(event) {
 
   if (event.type=='mousemove' && state=='grab')
   {
-    // intersects = raycaster.intersectObjects([piecesState.holdPiece]);
-    // console.log(intersects);
-  	// if (intersects.length) {
-  	//     intersects[0].object.position.x=5;
-  	// }
+    intersects = raycaster.intersectObjects([piecesState.holdPiece]);
+    if(intersects.length)
+      piecesState.holdPiece.position.x = intersects[0].point.x;
   }
 
   if (event.type=='mouseup' && state=='grab')
