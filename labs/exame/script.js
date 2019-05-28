@@ -16,7 +16,7 @@ let
 		helper = new THREE.PointLightHelper(light, 0.1),
     raycaster = new THREE.Raycaster();
 
-camera.position.set(10,10,10);
+camera.position.set(20,20,20);
 camera.lookAt(0,0,0);
 
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -51,7 +51,7 @@ plane.position.z = 0
 
 // scene.add(plane)
 
-spheregeom = new THREE.SphereGeometry(1, 32, 32)
+spheregeom = new THREE.SphereGeometry(0.3, 32, 32)
 spheremat = new THREE.MeshLambertMaterial({
     color: 0xCCCC55
 });
@@ -61,7 +61,7 @@ sphere.receiveShadow = true;
 
 // sphere.rotation.y = -Math.PI / 2.0
 sphere.position.x = 4
-sphere.position.y = 1
+sphere.position.y = 0.3
 sphere.position.z = 0
 
 
@@ -80,10 +80,10 @@ sphereBase.add(sphere)
 scene.add(planeBase)
 
 sphere_velocity = 0
-gravity = 0.001
+gravity = 0.0003
 
 var time = 0;
-var step = 0.05
+var step = 0.005
 var animate = function() {
     requestAnimationFrame(animate)
 
