@@ -14,12 +14,12 @@ let
 		}),
 		// Visualize point light location.
 		helper = new THREE.PointLightHelper(light, 0.1),
-    raycaster = new THREE.Raycaster();
+    keyboard = new KeyboardState();
 
 camera.position.set(20,20,20);
 camera.lookAt(0,0,0);
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(window.innerWidth*0.9, window.innerHeight*0.9);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -104,6 +104,34 @@ var animate = function() {
 
     rotatePlane()
     applyPhysicsToSphere()
+
+    keyboard.update();
+
+    // var moveDistance = 50 * clock.getDelta();
+    //
+    if ( keyboard.down("left") )
+      rotateLeft = true
+    if( keyboard.down("right"))
+      rotateLeft = false
+    if( keyboard.pressed("up") )
+      sphere.position.x += 0.1
+    if( keyboard.pressed("down") )
+      sphere.position.x -= 0.1
+
+    //
+    // if ( keyboard.down("right") )
+    //   mesh.translateX(  50 );
+    //
+    // if ( keyboard.pressed("A") )
+    //   mesh.translateX( -moveDistance );
+    //
+    // if ( keyboard.pressed("D") )
+    //   mesh.translateX(  moveDistance );
+    //
+    // if ( keyboard.down("R") )
+    //   mesh.material.color = new THREE.Color(0xff0000);
+    // if ( keyboard.up("R") )
+    //   mesh.material.color = new THREE.Color(0x0000ff);
 
     controls.update()
     renderer.render(scene, camera);
