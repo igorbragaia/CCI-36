@@ -44,8 +44,7 @@ plane = new THREE.Mesh(planegeom, planemat);
 plane.castShadow = true; //default is false
 plane.receiveShadow = true;
 
-plane.rotation.x = -Math.PI / 2.0
-
+plane.rotation.x = -Math.PI * (1/2)
 plane.position.x = 2
 plane.position.z = 0
 
@@ -59,17 +58,9 @@ sphere = new THREE.Mesh(spheregeom, spheremat);
 sphere.castShadow = true; //default is false
 sphere.receiveShadow = true;
 
-// sphere.rotation.y = -Math.PI / 2.0
-sphere.position.x = 4
+sphere.position.x = 0
 sphere.position.y = 0.3
-sphere.position.z = 0
-
-
-// let group = new THREE.Group();
-// group.add(sphere)
-// group.add(plane)
-
-// scene.add(group)
+sphere.position.z = 10
 
 var planeBase = new THREE.Object3D()
 var sphereBase = new THREE.Object3D()
@@ -80,27 +71,39 @@ sphereBase.add(sphere)
 scene.add(planeBase)
 
 sphere_velocity = 0
-gravity = 0.0003
+gravity = 0.0002
 
-var time = 0;
-var step = 0.005
+
+rotateLeft = true
+let rotatePlane = () => {
+  if(rotateLeft) {
+    if(planeBase.rotation.x > -Math.PI * (1/4))
+      planeBase.rotation.x -= Math.PI * 0.001
+    else
+      rotateLeft = !rotateLeft
+  } else {
+    if(planeBase.rotation.x < Math.PI * (1/4))
+      planeBase.rotation.x += Math.PI * 0.001
+    else
+      rotateLeft = !rotateLeft
+  }
+}
+
+let getGravity = () => {
+  return gravity * Math.sin(planeBase.rotation.x)
+}
+
+v = 0
+let applyPhysicsToSphere = () => {
+  v += getGravity()
+  sphere.position.z += v
+}
+
 var animate = function() {
     requestAnimationFrame(animate)
 
-    planeBase.rotation.x = time
-
-    g = gravity * Math.sin(time)
-
-    sphereBase.position.z += sphere_velocity
-    sphere_velocity += g
-    console.log(g)
-
-    if(time > 1)
-      step = -0.005
-    if(time < -1)
-      step = 0.005
-
-    time += step // em radianos
+    rotatePlane()
+    applyPhysicsToSphere()
 
     controls.update()
     renderer.render(scene, camera);
