@@ -37,9 +37,7 @@ scene.add(light);
 scene.add(helper);
 
 planegeom = new THREE.PlaneGeometry(50, 50)
-planemat = new THREE.MeshLambertMaterial({
-    color: 0xCCCC55
-});
+planemat = new THREE.MeshLambertMaterial({color: 0xffa500});
 plane = new THREE.Mesh(planegeom, planemat);
 plane.castShadow = true; //default is false
 plane.receiveShadow = true;
@@ -50,23 +48,50 @@ plane.position.z = 0
 
 // scene.add(plane)
 
-spheregeom = new THREE.SphereGeometry(0.3, 32, 32)
+spheregeom = new THREE.BoxGeometry(1, 1, 1)
 spheremat = new THREE.MeshLambertMaterial({
-    color: 0xCCCC55
+    color: 0x800000
 });
 sphere = new THREE.Mesh(spheregeom, spheremat);
 sphere.castShadow = true; //default is false
 sphere.receiveShadow = true;
 
 sphere.position.x = 0
-sphere.position.y = 0.3
-sphere.position.z = 10
+sphere.position.y = 1/2
+sphere.position.z = 20
 
 var planeBase = new THREE.Object3D()
 var sphereBase = new THREE.Object3D()
 planeBase.add(plane)
 planeBase.add(sphereBase)
 sphereBase.add(sphere)
+
+var borders = new THREE.Group();
+var getBorder = (pos_x,pos_y,pos_z,x,y,z, rot_x) => {
+  var border = new THREE.Mesh(new THREE.BoxGeometry(x,y,z), new THREE.MeshLambertMaterial({color: 0xffa500}));
+  border.position.x = pos_x
+  border.position.y = pos_y
+  border.position.z = pos_z
+  border.rotation.y = rot_x
+  return border
+}
+borders.add(getBorder(2,0,-25,50,1,1,0))
+borders.add(getBorder(2,0,25,50,1,1,0))
+borders.add(getBorder(-23,0,0,1,1,50,0))
+borders.add(getBorder(27,0,0,1,1,50,0))
+borders.add(getBorder(2,0,-10,10,1,1,0))
+borders.add(getBorder(2,0,10,10,1,1,0))
+borders.add(getBorder(-10,0,0,1,1,10,0))
+borders.add(getBorder(10,0,0,1,1,10,0))
+borders.add(getBorder(2,0,-15,10,1,1,0))
+borders.add(getBorder(2,0,15,10,1,1,0))
+borders.add(getBorder(-15,0,0,1,1,10,0))
+borders.add(getBorder(15,0,0,1,1,10,0))
+borders.add(getBorder(17,0,-15,1,1,10,Math.PI/4))
+borders.add(getBorder(-15,0,-17,1,1,10,-Math.PI/4))
+borders.add(getBorder(-15,0,17,1,1,10,Math.PI/4))
+borders.add(getBorder(19,0,17,1,1,10,-Math.PI/4))
+planeBase.add(borders)
 
 scene.add(planeBase)
 
@@ -107,8 +132,6 @@ var animate = function() {
 
     keyboard.update();
 
-    // var moveDistance = 50 * clock.getDelta();
-    //
     if ( keyboard.down("left") )
       rotateLeft = true
     if( keyboard.down("right"))
@@ -117,21 +140,6 @@ var animate = function() {
       sphere.position.x += 0.1
     if( keyboard.pressed("down") )
       sphere.position.x -= 0.1
-
-    //
-    // if ( keyboard.down("right") )
-    //   mesh.translateX(  50 );
-    //
-    // if ( keyboard.pressed("A") )
-    //   mesh.translateX( -moveDistance );
-    //
-    // if ( keyboard.pressed("D") )
-    //   mesh.translateX(  moveDistance );
-    //
-    // if ( keyboard.down("R") )
-    //   mesh.material.color = new THREE.Color(0xff0000);
-    // if ( keyboard.up("R") )
-    //   mesh.material.color = new THREE.Color(0x0000ff);
 
     controls.update()
     renderer.render(scene, camera);
